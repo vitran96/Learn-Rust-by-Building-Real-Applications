@@ -1,6 +1,2 @@
 [workspace]
-members = [
-    "server",
-    "mars_calc",
-    "memory_management",
-]
+members = ["server", "mars_calc", "memory_management", "my_server"]
