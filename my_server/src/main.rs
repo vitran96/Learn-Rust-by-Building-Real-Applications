@@ -1,5 +1,8 @@
+use http::request::Request;
+use server::Server;
+
 mod http {
-    mod method {
+    pub mod method {
         pub enum Method {
             GET,
             POST,
@@ -13,11 +16,13 @@ mod http {
         }
     }
 
-    mod request {
+    pub mod request {
+        use super::method::Method;
+
         pub struct Request {
             path: String,
             query_string: Option<String>,
-            method: super::method::Method,
+            method: Method,
         }
     }
 }
@@ -42,6 +47,6 @@ mod server {
 
 fn main() {
     // Start the server
-    let server = server::Server::new("127.0.0.1:8080".to_string());
+    let server = Server::new("127.0.0.1:8080".to_string());
     server.run();
 }
