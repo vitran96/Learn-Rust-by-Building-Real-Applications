@@ -1,7 +1,4 @@
-use std::{
-    error::Error,
-    net::{SocketAddr, TcpListener, TcpStream},
-};
+use std::{io::Read, net::TcpListener};
 
 pub struct Server {
     addr: String,
@@ -21,8 +18,16 @@ impl Server {
         loop {
             let res = listener.accept();
             match res {
-                Ok((stream, _)) => {
-                    println!("Ok");
+                // stream:TcpStream,
+                Ok((mut stream, _)) => {
+                    println!("Connection established");
+                    let mut buf = [0; 1024];
+                    match stream.read(&mut buf) {
+                        Ok(_) => {
+                            println!("Received a request: {}", String::from_utf8_lossy(&buf));
+                        }
+                        Err(e) => println!("Failed to read from connection: {}", e),
+                    }
                 }
                 Err(e) => println!("Failed to establish a connection: {}", e),
             }
