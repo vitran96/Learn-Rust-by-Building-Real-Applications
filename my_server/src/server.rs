@@ -1,3 +1,6 @@
+// Must go from root. We use "crate::" instead of "super::"
+use crate::http::request::{self, Request};
+use std::convert::TryFrom;
 use std::{io::Read, net::TcpListener};
 
 pub struct Server {
@@ -21,10 +24,21 @@ impl Server {
                 // stream:TcpStream,
                 Ok((mut stream, _)) => {
                     println!("Connection established");
+                    // Byte slice?
                     let mut buf = [0; 1024];
                     match stream.read(&mut buf) {
                         Ok(_) => {
                             println!("Received a request: {}", String::from_utf8_lossy(&buf));
+
+                            // must convert to &[u8; 1024]
+                            // Request::try_from(&buf[..]);
+                            // let res: &Result<Request, _> = &buf.try_into();
+                            match Request::try_from(&buf[..]) {
+                                Ok(request) => {
+                                    todo!()
+                                }
+                                Err(e) => println!("Failed to parse a request:  {}", e),
+                            }
                         }
                         Err(e) => println!("Failed to read from connection: {}", e),
                     }
