@@ -55,6 +55,7 @@ impl Error for ParseError {
 
 // REQUIRED to implement Error trait to ParseError
 impl Display for ParseError {
+    // We can use "use std::fmt::Result as FmtResult;" to avoid used of name "Result"
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         todo!()
     }
