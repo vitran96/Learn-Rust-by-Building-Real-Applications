@@ -43,6 +43,8 @@ impl TryFrom<&[u8]> for Request {
 
         // Alternative to above match => this will wrap any error
         let request = std::str::from_utf8(value)?;
+
+        // Next, we need to parse the request
         todo!()
     }
 }
@@ -67,21 +69,7 @@ impl ParseError {
 
 // OPTIONAL
 // But we should implement this for our custom error type
-impl Error for ParseError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-
-    fn description(&self) -> &str {
-        "description() is deprecated; use Display"
-    }
-
-    fn cause(&self) -> Option<&dyn Error> {
-        self.source()
-    }
-
-    // fn provide<'a>(&'a self, demand: &mut std::any::Demand<'a>) {}
-}
+impl Error for ParseError {}
 
 // REQUIRED to implement Error trait to ParseError
 impl Display for ParseError {
