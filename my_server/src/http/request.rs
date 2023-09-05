@@ -21,7 +21,7 @@ impl Request {
 }
 
 impl TryFrom<&[u8]> for Request {
-    type Error = String;
+    type Error = ParseError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         todo!()
@@ -33,6 +33,17 @@ pub enum ParseError {
     InvalidEncoding,
     InvalidProtocol,
     InvalidMethod,
+}
+
+impl ParseError {
+    fn message(&self) -> &str {
+        match self {
+            Self::InvalidRequest => "InvalidRequest",
+            Self::InvalidEncoding => "InvalidEncoding",
+            Self::InvalidProtocol => "InvalidProtocol",
+            Self::InvalidMethod => "InvalidMethod",
+        }
+    }
 }
 
 // OPTIONAL
@@ -57,18 +68,13 @@ impl Error for ParseError {
 impl Display for ParseError {
     // We can use "use std::fmt::Result as FmtResult;" to avoid used of name "Result"
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        write!(f, "{}", self.message())
     }
 }
 
 // REQUIRED to implement Error trait to ParseError
 impl Debug for ParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InvalidRequest => write!(f, "InvalidRequest"),
-            Self::InvalidEncoding => write!(f, "InvalidEncoding"),
-            Self::InvalidProtocol => write!(f, "InvalidProtocol"),
-            Self::InvalidMethod => write!(f, "InvalidMethod"),
-        }
+        write!(f, "{}", self.message())
     }
 }
