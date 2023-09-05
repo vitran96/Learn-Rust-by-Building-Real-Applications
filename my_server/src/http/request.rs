@@ -24,6 +24,8 @@ impl Request {
 impl TryFrom<&[u8]> for Request {
     type Error = ParseError;
 
+    // Parse data example:
+    // Eg 1: GET /search?name=abc&sort=1 HTTP/1.1\r\n...HEADERS...
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         // Basic validation
         // match std::str::from_utf8(value) {
@@ -47,6 +49,12 @@ impl TryFrom<&[u8]> for Request {
         // Next, we need to parse the request
         todo!()
     }
+}
+
+fn get_next_word(request: &str) -> Option<&str> {
+    // Char iterator
+    let mut iter = request.chars();
+    todo!()
 }
 
 pub enum ParseError {
