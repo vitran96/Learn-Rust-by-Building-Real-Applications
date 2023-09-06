@@ -47,22 +47,27 @@ impl TryFrom<&[u8]> for Request {
         // Alternative to above match => this will wrap any error
         let request = std::str::from_utf8(value)?;
 
-        // request must be sliced to removed parsed part
-        let method = get_next_word(request).ok_or(ParseError::InvalidMethod)?;
-        let query_string = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
-        let protocol = get_next_word(request).ok_or(ParseError::InvalidProtocol)?;
-
         // Next, we need to parse the request
+
+        // request must be sliced to removed parsed part
+        let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (query_string, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (protocol, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+
         todo!()
     }
 }
 
-fn get_next_word(request: &str) -> Option<&str> {
+fn get_next_word(request: &str) -> Option<(&str, &str)> {
     for (i, c) in request.chars().enumerate() {
         if c == ' ' {
             // result: begin -> current index
             let result = &request[..i];
-            return Some(result);
+
+            // unparsedPart: current index -> end
+            // then trim() to remove leading and trailing whitespaces -> not efficient but safer than trying to manipulate index
+            let unparsedPart = &request[i..].trim();
+            return Some((result, unparsedPart));
         }
     }
 
