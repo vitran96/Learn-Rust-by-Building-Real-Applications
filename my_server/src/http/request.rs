@@ -1,6 +1,7 @@
 use std::{
     error::Error,
     fmt::{Debug, Display},
+    result,
     str::Utf8Error,
 };
 
@@ -46,15 +47,26 @@ impl TryFrom<&[u8]> for Request {
         // Alternative to above match => this will wrap any error
         let request = std::str::from_utf8(value)?;
 
+        // request must be sliced to removed parsed part
+        let method = get_next_word(request).ok_or(ParseError::InvalidMethod)?;
+        let query_string = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let protocol = get_next_word(request).ok_or(ParseError::InvalidProtocol)?;
+
         // Next, we need to parse the request
         todo!()
     }
 }
 
 fn get_next_word(request: &str) -> Option<&str> {
-    // Char iterator
-    let mut iter = request.chars();
-    todo!()
+    for (i, c) in request.chars().enumerate() {
+        if c == ' ' {
+            // result: begin -> current index
+            let result = &request[..i];
+            return Some(result);
+        }
+    }
+
+    None
 }
 
 pub enum ParseError {
