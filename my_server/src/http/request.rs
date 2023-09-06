@@ -5,7 +5,7 @@ use std::{
     str::Utf8Error,
 };
 
-use super::Method;
+use super::{method::MethodError, Method};
 
 pub struct Request {
     path: String,
@@ -58,7 +58,7 @@ impl TryFrom<&[u8]> for Request {
             return Err(ParseError::InvalidProtocol);
         }
 
-        let method: Method = method.parse().or(Err(ParseError::InvalidMethod))?;
+        let method: Method = method.parse()?;
 
         todo!()
     }
@@ -121,5 +121,12 @@ impl Debug for ParseError {
 impl From<Utf8Error> for ParseError {
     fn from(_: Utf8Error) -> Self {
         Self::InvalidEncoding
+    }
+}
+
+// Automatically convert MethodError to ParseError
+impl From<MethodError> for ParseError {
+    fn from(_: MethodError) -> Self {
+        Self::InvalidMethod
     }
 }
