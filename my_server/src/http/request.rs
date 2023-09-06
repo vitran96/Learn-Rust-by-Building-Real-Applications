@@ -54,13 +54,17 @@ impl TryFrom<&[u8]> for Request {
         let (query_string, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
         let (protocol, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
 
+        if protocol != "HTTP/1.1" {
+            return Err(ParseError::InvalidProtocol);
+        }
+
         todo!()
     }
 }
 
 fn get_next_word(request: &str) -> Option<(&str, &str)> {
     for (i, c) in request.chars().enumerate() {
-        if c == ' ' {
+        if c == ' ' || c == '\r' {
             // result: begin -> current index
             let result = &request[..i];
 
