@@ -58,6 +58,8 @@ impl TryFrom<&[u8]> for Request {
             return Err(ParseError::InvalidProtocol);
         }
 
+        let method: Method = method.parse().or(Err(ParseError::InvalidMethod))?;
+
         todo!()
     }
 }
