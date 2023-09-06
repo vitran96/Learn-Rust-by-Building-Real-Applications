@@ -68,10 +68,10 @@ fn get_next_word(request: &str) -> Option<(&str, &str)> {
             // result: begin -> current index
             let result = &request[..i];
 
-            // unparsedPart: current index -> end
+            // unused_part: current index -> end
             // then trim() to remove leading and trailing whitespaces -> not efficient but safer than trying to manipulate index
-            let unparsedPart = &request[i..].trim();
-            return Some((result, unparsedPart));
+            let unused_part = &request[i..].trim();
+            return Some((result, unused_part));
         }
     }
 
