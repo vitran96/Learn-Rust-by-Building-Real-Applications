@@ -51,7 +51,7 @@ impl TryFrom<&[u8]> for Request {
 
         // request must be sliced to removed parsed part
         let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
-        let (query_string, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (path, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
         let (protocol, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
 
         if protocol != "HTTP/1.1" {
