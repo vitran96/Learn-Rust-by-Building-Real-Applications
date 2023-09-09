@@ -1,15 +1,21 @@
 use std::{
     error::Error,
     fmt::{Debug, Display},
-    result,
     str::Utf8Error,
 };
 
 use super::{method::MethodError, Method};
 
+// We will switch from String to &str (string slice)
+// Why?
+// Because we don't need to own the data
+// String will save the data to heap & allow us to manipulate the data
+// &str will save the data to stack & we can't manipulate the data
+// But a request should be immutable
 pub struct Request {
-    path: String,
-    query_string: Option<String>,
+    path: &str,
+    // This query_string does not handle multiple query_string
+    query_string: Option<&str>,
     method: Method,
 }
 
@@ -96,7 +102,11 @@ impl TryFrom<&[u8]> for Request {
             path = &path[..i];
         }
 
-        todo!()
+        Ok(Self {
+            path: path,
+            query_string: query_string,
+            method: method,
+        })
     }
 }
 
