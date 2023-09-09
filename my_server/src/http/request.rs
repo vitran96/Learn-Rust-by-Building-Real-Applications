@@ -51,7 +51,7 @@ impl TryFrom<&[u8]> for Request {
 
         // request must be sliced to removed parsed part
         let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
-        let (path, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (mut path, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
         let (protocol, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
 
         if protocol != "HTTP/1.1" {
@@ -59,6 +59,42 @@ impl TryFrom<&[u8]> for Request {
         }
 
         let method: Method = method.parse()?;
+
+        // Be default, set query_string to None
+        // since we don't know if there is query_string or not
+        let mut query_string = None;
+
+        // Using 'match'
+        // match path.find('?') {
+        //     Some(i) => {
+        //         // i+1 to skip '?'
+        //         query_string = Some(&request[i + 1..]);
+
+        //         // path of the request
+        //         path = &path[..i];
+        //     }
+        //     None => {}
+        // }
+
+        // Using 'unwrap'
+        // let q = path.find('?');
+        // if q.is_some() {
+        //     let i = q.unwrap();
+        //     // i+1 to skip '?'
+        //     query_string = Some(&request[i + 1..]);
+
+        //     // path of the request
+        //     path = &path[..i];
+        // }
+
+        // Using 'if let'
+        if let Some(i) = path.find('?') {
+            // i+1 to skip '?'
+            query_string = Some(&request[i + 1..]);
+
+            // path of the request
+            path = &path[..i];
+        }
 
         todo!()
     }
