@@ -4,7 +4,7 @@ use std::{
     str::Utf8Error,
 };
 
-use super::{method::MethodError, Method};
+use super::{method::MethodError, Method, QueryString};
 
 // We will switch from String to &str (string slice)
 // Why?
@@ -17,8 +17,7 @@ use super::{method::MethodError, Method};
 // we are going to use
 pub struct Request<'buf> {
     path: &'buf str,
-    // This query_string does not handle multiple query_string
-    query_string: Option<&'buf str>,
+    query_string: Option<QueryString<'buf>>,
     method: Method,
 }
 
@@ -98,7 +97,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         // Using 'if let'
         if let Some(i) = path.find('?') {
             // i+1 to skip '?'
-            query_string = Some(&request[i + 1..]);
+            query_string = Some(QueryString::from(&request[i + 1..]));
 
             // path of the request
             path = &path[..i];

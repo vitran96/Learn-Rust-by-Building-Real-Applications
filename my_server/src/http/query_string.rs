@@ -21,3 +21,41 @@ impl<'buf> QueryString<'buf> {
         self.data.get(key)
     }
 }
+
+// Why not use TryFrom?
+// Because this should not fail
+// Borrowed input &str
+impl<'buf> From<&'buf str> for QueryString<'buf> {
+    fn from(s: &'buf str) -> QueryString<'buf> {
+        // Create empty HashMap
+        let mut data = HashMap::new();
+
+        for parameter_string in s.split('&') {
+            // We will assign parameter_string to key
+            // incase there is no '=' in the parameter_string
+            let mut key = parameter_string;
+            let mut value = "";
+
+            if let Some(i) = parameter_string.find('=') {
+                key = &parameter_string[..i];
+                value = &parameter_string[i + 1..];
+            }
+
+            // If key already exist in HashMap
+            data.entry(key)
+                // we will append the value to the existing key
+                .and_modify(|existing| match existing {
+                    Value::Single(prev_value) => {
+                        let vec = vec![value, prev_value];
+                        // Swap memory address in existing to new Value::Multiple
+                        *existing = Value::Multiple(vec);
+                    }
+                    Value::Multiple(vec) => vec.push(value),
+                })
+                // else we will create a new key with the value
+                .or_insert(Value::Single(value));
+        }
+
+        QueryString { data: data }
+    }
+}
