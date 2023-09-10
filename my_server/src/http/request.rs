@@ -23,12 +23,11 @@ pub struct Request<'buf> {
 }
 
 impl Request<'_> {
-    /**
-     * Might fail
-     */
-    fn from_byte_array(buf: &[u8]) -> Result<Self, String> {
-        todo!()
-    }
+    // Might fail
+    // I don't remember what this function was for
+    // fn from_byte_array(buf: &[u8]) -> Result<Self, String> {
+    //     todo!()
+    // }
 }
 
 impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
