@@ -1,3 +1,6 @@
+// Disabling compiler dead code warnings
+// #![allow(dead_code)]
+
 // Must go from root. We use "crate::" instead of "super::"
 use crate::http::request::Request;
 use std::convert::TryFrom;
