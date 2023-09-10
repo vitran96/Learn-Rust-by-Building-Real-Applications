@@ -1,5 +1,5 @@
 // Must go from root. We use "crate::" instead of "super::"
-use crate::http::request::{self, Request};
+use crate::http::request::Request;
 use std::convert::TryFrom;
 use std::{io::Read, net::TcpListener};
 
@@ -35,6 +35,9 @@ impl Server {
                             // let res: &Result<Request, _> = &buf.try_into();
                             match Request::try_from(&buf[..]) {
                                 Ok(request) => {
+                                    // buf is borrowed by request.
+                                    // so we can't use buf anymore
+                                    // Eg: bug[0] = 0; is not allowed
                                     todo!()
                                 }
                                 Err(e) => println!("Failed to parse a request:  {}", e),

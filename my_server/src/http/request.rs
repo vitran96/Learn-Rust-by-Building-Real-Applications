@@ -12,14 +12,17 @@ use super::{method::MethodError, Method};
 // String will save the data to heap & allow us to manipulate the data
 // &str will save the data to stack & we can't manipulate the data
 // But a request should be immutable
-pub struct Request {
-    path: &str,
+// --
+// &str requires lifetime annotation
+// we are going to use
+pub struct Request<'buf> {
+    path: &'buf str,
     // This query_string does not handle multiple query_string
-    query_string: Option<&str>,
+    query_string: Option<&'buf str>,
     method: Method,
 }
 
-impl Request {
+impl Request<'_> {
     /**
      * Might fail
      */
@@ -28,12 +31,12 @@ impl Request {
     }
 }
 
-impl TryFrom<&[u8]> for Request {
+impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = ParseError;
 
     // Parse data example:
     // Eg 1: GET /search?name=abc&sort=1 HTTP/1.1\r\n...HEADERS...
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(value: &'buf [u8]) -> Result<Request<'buf>, Self::Error> {
         // Basic validation
         // match std::str::from_utf8(value) {
         //     Ok(request) => {}
@@ -110,6 +113,10 @@ impl TryFrom<&[u8]> for Request {
     }
 }
 
+// this function only has 1 &str
+// so by default, it will point to the same lifetime reference as the input
+// however, if we have more parameters, we need to specify the lifetime reference for each parameter
+//   because the compiler can't infer the lifetime reference
 fn get_next_word(request: &str) -> Option<(&str, &str)> {
     for (i, c) in request.chars().enumerate() {
         if c == ' ' || c == '\r' {
