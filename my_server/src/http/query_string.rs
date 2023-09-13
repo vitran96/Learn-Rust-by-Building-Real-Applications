@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+#[derive(Debug)]
 pub struct QueryString<'buf> {
     // &str'buf str won't be complaining about lifetime reference
     // until this module is know by the compiler
@@ -11,6 +12,7 @@ pub struct QueryString<'buf> {
 // Query parameter type
 // Eg: ?key=value&key2=value2 => key and key2 are Single
 // Eg: ?key=value&key=value2 => key is Multiple
+#[derive(Debug)]
 pub enum Value<'buf> {
     Single(&'buf str),
     Multiple(Vec<&'buf str>),
@@ -29,6 +31,7 @@ impl<'buf> From<&'buf str> for QueryString<'buf> {
     fn from(s: &'buf str) -> QueryString<'buf> {
         // Create empty HashMap
         let mut data = HashMap::new();
+        // dbg!(s);
 
         for parameter_string in s.split('&') {
             // We will assign parameter_string to key

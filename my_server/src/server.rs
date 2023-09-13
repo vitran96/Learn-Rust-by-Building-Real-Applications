@@ -1,4 +1,6 @@
 // Disabling compiler dead code warnings
+// #![] has '!' so this attribute will apply to this item
+// and also sub-item
 // #![allow(dead_code)]
 
 // Must go from root. We use "crate::" instead of "super::"
@@ -41,7 +43,7 @@ impl Server {
                                     // buf is borrowed by request.
                                     // so we can't use buf anymore
                                     // Eg: bug[0] = 0; is not allowed
-                                    todo!()
+                                    dbg!(request);
                                 }
                                 Err(e) => println!("Failed to parse a request:  {}", e),
                             }

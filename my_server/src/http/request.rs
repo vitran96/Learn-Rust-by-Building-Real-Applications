@@ -15,6 +15,9 @@ use super::{method::MethodError, Method, QueryString};
 // --
 // &str requires lifetime annotation
 // we are going to use
+//
+// #[] has no '!' so this attribute will only be applied to the line following it
+#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
     query_string: Option<QueryString<'buf>>,
@@ -97,7 +100,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         // Using 'if let'
         if let Some(i) = path.find('?') {
             // i+1 to skip '?'
-            query_string = Some(QueryString::from(&request[i + 1..]));
+            query_string = Some(QueryString::from(&path[i + 1..]));
 
             // path of the request
             path = &path[..i];
