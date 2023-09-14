@@ -3,9 +3,11 @@
 // and also sub-item
 // #![allow(dead_code)]
 
+use crate::http::{response, Response, StatusCode};
 // Must go from root. We use "crate::" instead of "super::"
 use crate::http::request::Request;
 use std::convert::TryFrom;
+use std::io::Write;
 use std::{io::Read, net::TcpListener};
 
 pub struct Server {
@@ -44,6 +46,15 @@ impl Server {
                                     // so we can't use buf anymore
                                     // Eg: bug[0] = 0; is not allowed
                                     dbg!(request);
+
+                                    // let response =
+                                    //     Response::new(crate::http::StatusCode::NotFound, None);
+
+                                    let response = Response::new(
+                                        StatusCode::Ok,
+                                        Some("<h1>Hello world!</h1>".to_string()),
+                                    );
+                                    write!(stream, "{}", response);
                                 }
                                 Err(e) => println!("Failed to parse a request:  {}", e),
                             }
