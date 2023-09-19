@@ -20,7 +20,18 @@ impl Response {
         }
     }
 
-    pub fn send(&self, stream: &mut TcpStream) -> std::io::Result<()> {
+    // This is an OK way to send response, but it is not generic
+    // pub fn send(&self, stream: &mut TcpStream) -> std::io::Result<()> {
+
+    // This one will compile, but might not work at runtime
+    // pub fn send(&self, stream: &mut Write) -> std::io::Result<()> {
+
+    // This one will create an overhead at runtime, because it will try to look up for Write trait implementation at runtime
+    // pub fn send(&self, stream: &mut dyn Write) -> std::io::Result<()> {
+
+    // This one will make compilation slower and artifact bigger,
+    // because it will lookup Write trail implementation and implement this function twice at compile time
+    pub fn send(&self, stream: &mut impl Write) -> std::io::Result<()> {
         let body = match &self.body {
             Some(b) => b,
             None => "",
