@@ -3,12 +3,21 @@
 // and also sub-item
 // #![allow(dead_code)]
 
-use crate::http::{Response, StatusCode};
+use crate::http::{ParseError, Response, StatusCode};
 // Must go from root. We use "crate::" instead of "super::"
 use crate::http::request::Request;
 use std::convert::TryFrom;
-use std::io::Write;
 use std::{io::Read, net::TcpListener};
+
+pub trait Handler {
+    fn handle_request(&mut self, request: &Request) -> Response;
+
+    fn handle_bad_request(&mut self, e: &ParseError) -> Response {
+        // Default implementation
+        println!("Failed to parse a request:  {}", e);
+        Response::new(StatusCode::BadRequest, None)
+    }
+}
 
 pub struct Server {
     addr: String,
@@ -21,7 +30,7 @@ impl Server {
         }
     }
 
-    pub fn run(self) {
+    pub fn run(self, mut handler: impl Handler) {
         let listener: TcpListener = TcpListener::bind(&self.addr).unwrap();
         println!("Listening on {}", self.addr);
 
@@ -45,22 +54,25 @@ impl Server {
                                     // buf is borrowed by request.
                                     // so we can't use buf anymore
                                     // Eg: bug[0] = 0; is not allowed
-                                    dbg!(request);
+                                    // dbg!(request);
 
                                     // let response =
                                     //     Response::new(crate::http::StatusCode::NotFound, None);
 
-                                    Response::new(
-                                        StatusCode::Ok,
-                                        Some("<h1>Hello world!</h1>".to_string()),
-                                    )
+                                    // Response::new(
+                                    //     StatusCode::Ok,
+                                    //     Some("<h1>Hello world!</h1>".to_string()),
+                                    // )
 
                                     // Doing this, we will create new allocation
                                     // write!(stream, "{}", response);
+
+                                    handler.handle_request(&request)
                                 }
                                 Err(e) => {
-                                    println!("Failed to parse a request:  {}", e);
-                                    Response::new(StatusCode::BadRequest, None)
+                                    // println!("Failed to parse a request:  {}", e);
+                                    // Response::new(StatusCode::BadRequest, None)
+                                    handler.handle_bad_request(&e)
                                 }
                             };
 
