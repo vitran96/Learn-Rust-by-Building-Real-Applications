@@ -1,4 +1,8 @@
-use std::fmt::{Display, Formatter};
+use std::{
+    fmt::{Display, Formatter},
+    io::Write,
+    net::TcpStream,
+};
 
 use super::StatusCode;
 
@@ -15,16 +19,31 @@ impl Response {
             body: body,
         }
     }
-}
 
-impl Display for Response {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+    pub fn send(&self, stream: &mut TcpStream) -> std::io::Result<()> {
+        let body = match &self.body {
+            Some(b) => b,
+            None => "",
+        };
+
         write!(
-            f,
+            stream,
             "HTTP/1.1 {} {}\r\n\r\n{}",
             self.status_code,
             self.status_code.reason_phrase(),
-            self.body.clone().unwrap_or(String::from(""))
+            body
         )
     }
 }
+
+// impl Display for Response {
+//     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+//         write!(
+//             f,
+//             "HTTP/1.1 {} {}\r\n\r\n{}",
+//             self.status_code,
+//             self.status_code.reason_phrase(),
+//             self.body.clone().unwrap_or(String::from(""))
+//         )
+//     }
+// }

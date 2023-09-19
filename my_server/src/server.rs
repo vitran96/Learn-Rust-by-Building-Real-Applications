@@ -3,7 +3,7 @@
 // and also sub-item
 // #![allow(dead_code)]
 
-use crate::http::{response, Response, StatusCode};
+use crate::http::{Response, StatusCode};
 // Must go from root. We use "crate::" instead of "super::"
 use crate::http::request::Request;
 use std::convert::TryFrom;
@@ -40,7 +40,7 @@ impl Server {
                             // must convert to &[u8; 1024]
                             // Request::try_from(&buf[..]);
                             // let res: &Result<Request, _> = &buf.try_into();
-                            match Request::try_from(&buf[..]) {
+                            let result = match Request::try_from(&buf[..]) {
                                 Ok(request) => {
                                     // buf is borrowed by request.
                                     // so we can't use buf anymore
@@ -50,13 +50,23 @@ impl Server {
                                     // let response =
                                     //     Response::new(crate::http::StatusCode::NotFound, None);
 
-                                    let response = Response::new(
+                                    Response::new(
                                         StatusCode::Ok,
                                         Some("<h1>Hello world!</h1>".to_string()),
-                                    );
-                                    write!(stream, "{}", response);
+                                    )
+
+                                    // Doing this, we will create new allocation
+                                    // write!(stream, "{}", response);
                                 }
-                                Err(e) => println!("Failed to parse a request:  {}", e),
+                                Err(e) => {
+                                    println!("Failed to parse a request:  {}", e);
+                                    Response::new(StatusCode::BadRequest, None)
+                                }
+                            };
+
+                            // Send and Check error here
+                            if let Err(e) = result.send(&mut stream) {
+                                println!("Failed to send response: {}", e);
                             }
                         }
                         Err(e) => println!("Failed to read from connection: {}", e),
