@@ -18,6 +18,11 @@ impl WebsiteHandler {
 
     fn read_file(&self, file_path: &str) -> Option<String> {
         let path = format!("{}/{}", self.public_path, file_path);
+
+        // This will cause security issue
+        // because if path contains "../" it will go up the directory
+        // and hacker can access all of our server files
+
         // ok() will convert Result<T, E> to Option<T>
         // very handy
         fs::read_to_string(path).ok()
@@ -34,7 +39,10 @@ impl Handler for WebsiteHandler {
                 // "/" => Response::new(StatusCode::Ok, Some("<h1>Hello world!</h1>".to_string())),
                 "/" => Response::new(StatusCode::Ok, self.read_file("index.html")),
                 "/welcome" => Response::new(StatusCode::Ok, Some("<h1>Welcome!</h1>".to_string())),
-                _ => Response::new(StatusCode::NotFound, None),
+                path => match self.read_file(path) {
+                    Some(content) => Response::new(StatusCode::Ok, Some(content)),
+                    None => Response::new(StatusCode::NotFound, None),
+                },
             },
             _ => Response::new(StatusCode::NotFound, None),
         }
