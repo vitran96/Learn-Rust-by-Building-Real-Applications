@@ -24,12 +24,25 @@ pub struct Request<'buf> {
     method: Method,
 }
 
-impl Request<'_> {
+impl<'buf> Request<'buf> {
     // Might fail
     // I don't remember what this function was for
     // fn from_byte_array(buf: &[u8]) -> Result<Self, String> {
     //     todo!()
     // }
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    // We can return &Option<QueryString> instead
+    // but it is better to return Option<> to a reference instead of reference to Option<>
+    pub fn query_string(&self) -> Option<&QueryString> {
+        self.query_string.as_ref()
+    }
 }
 
 impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
