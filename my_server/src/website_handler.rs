@@ -23,9 +23,22 @@ impl WebsiteHandler {
         // because if path contains "../" it will go up the directory
         // and hacker can access all of our server files
 
-        // ok() will convert Result<T, E> to Option<T>
-        // very handy
-        fs::read_to_string(path).ok()
+        // we can fix this security error by checking the real path
+        match fs::canonicalize(path) {
+            Ok(path) => {
+                if path.starts_with(&self.public_path) {
+                    // path is safe
+                    // ok() will convert Result<T, E> to Option<T>
+                    // very handy
+                    fs::read_to_string(path).ok()
+                } else {
+                    // path is not safe
+                    println!("Directory Traversal Attack Attempted: {}", file_path);
+                    None
+                }
+            }
+            Err(_) => None,
+        }
     }
 }
 
